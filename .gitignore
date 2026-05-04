@@ -2,3 +2,5 @@
 catboost_info
 wandb
 __pycache__
+submission.csv
+model.cbm
