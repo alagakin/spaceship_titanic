@@ -2,7 +2,7 @@ import pandas as pd
 from typing import Callable
 
 SPENDING_COLS = ['RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck']
-CAT_FEATURES = ['HomePlanet', 'Cabin', 'Destination']
+CAT_FEATURES = ['HomePlanet', 'cabin_deck', 'cabin_side', 'Destination', 'age_group']
 
 TransformFn = Callable[[pd.DataFrame], pd.DataFrame]
 
@@ -38,6 +38,33 @@ def add_missing_flags(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def add_total_spend(df: pd.DataFrame) -> pd.DataFrame:
+    df['total_spend'] = df[SPENDING_COLS].sum(axis=1)
+    return df
+
+
+def add_has_any_spend(df: pd.DataFrame) -> pd.DataFrame:
+    df['has_any_spend'] = (df['total_spend'] > 0).astype(int)
+    return df
+
+
+def add_age_group(df: pd.DataFrame) -> pd.DataFrame:
+    df['age_group'] = pd.cut(
+        df['Age'],
+        bins=[0, 17, 64, float('inf')],
+        labels=['child', 'adult', 'senior'],
+    ).astype(object)
+    return df
+
+
+def split_cabin(df: pd.DataFrame) -> pd.DataFrame:
+    parts = df['Cabin'].str.split('/', expand=True)
+    df['cabin_deck'] = parts[0]
+    df['cabin_num'] = pd.to_numeric(parts[1], errors='coerce')
+    df['cabin_side'] = parts[2]
+    return df.drop(columns=['Cabin'])
+
+
 def cast_types(df: pd.DataFrame) -> pd.DataFrame:
     df['CryoSleep'] = df['CryoSleep'].astype(float)
     df['VIP'] = df['VIP'].astype(float)
@@ -52,6 +79,10 @@ def build_pipeline() -> list[TransformFn]:
         impute_cryo_spending,
         impute_group_mode,
         add_missing_flags,
+        add_total_spend,
+        add_has_any_spend,
+        add_age_group,
+        split_cabin,
         cast_types,
     ]
 
