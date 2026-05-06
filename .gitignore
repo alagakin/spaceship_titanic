@@ -5,3 +5,4 @@ __pycache__
 submission.csv
 model.cbm
 submission.csv
+*.pkl

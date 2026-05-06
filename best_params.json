@@ -1,5 +1,7 @@
-{                                                                                                                                                                                
-    "iterations": 3000,                                                                                                                                                            
-    "learning_rate": 0.01,                                                                                                                                                         
-    "depth": 5                                                                                                                                                                     
-  }
+{
+  "iterations": 3412,
+  "learning_rate": 0.006446831836813848,
+  "depth": 7,
+  "l2_leaf_reg": 4.4217638410210895,
+  "bagging_temperature": 0.8818018101838497
+}

@@ -1,28 +1,24 @@
 import pandas as pd
+import joblib
 import wandb
-from catboost import CatBoostClassifier
 from dotenv import load_dotenv
-
-from features import preprocess
 
 load_dotenv()
 
-model = CatBoostClassifier()
-model.load_model("model.cbm")
-
+pipeline = joblib.load("pipeline.pkl")
 test_df = pd.read_csv("data/test.csv")
-X_test, passenger_ids = preprocess(test_df, is_train=False)
+passenger_ids = test_df['PassengerId'].copy()
 
-preds = model.predict(X_test).astype(bool)
+preds = pipeline.predict(test_df).astype(bool)
 
 submission = pd.DataFrame({"PassengerId": passenger_ids, "Transported": preds})
 submission.to_csv("submission.csv", index=False)
 
 n_transported = preds.sum()
-run = wandb.init(
+wandb.init(
     project="spaceship-titanic",
     job_type="predict",
-    config=model.get_params(),
+    config=pipeline.named_steps['model'].get_params(),
 )
 wandb.log({
     "n_rows": len(submission),
