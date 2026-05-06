@@ -133,7 +133,7 @@ class TypeCaster(BaseEstimator, TransformerMixin):
         return X
 
 
-def build_pipeline(model_params: dict, random_seed: int = 42, verbose: int = 0) -> Pipeline:
+def build_pipeline(model_params: dict, *, random_seed: int = 42, verbose: int = 0) -> Pipeline:
     return Pipeline([
         ('group_features',   GroupFeaturesExtractor()),
         ('cryo_impute',      CryoSpendingImputer()),
