@@ -13,12 +13,17 @@ PIPELINE_STEPS = [
 
 
 class GroupFeaturesExtractor(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None): return self
+    def fit(self, X, y=None):
+        self.surname_counts_ = X['Name'].str.split().str[-1].value_counts()
+        return self
+
     def transform(self, X):
         X = X.copy()
         X['p_group'] = X['PassengerId'].str[:4].astype(int)
         X['p_group_id'] = X['PassengerId'].str[5:].astype(int)
         X['g_size'] = X.groupby('p_group')['p_group'].transform('count')
+        surname = X['Name'].str.split().str[-1]
+        X['surname_size'] = surname.map(self.surname_counts_).fillna(1).astype(int)
         return X.drop(columns=['PassengerId', 'Name'])
 
 
